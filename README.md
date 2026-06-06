@@ -1,47 +1,46 @@
-# ARSW - Laboratorio #2
+# ARSW - Laboratory #2
 
-## Sincronización por Barrera en Java
+## Barrier Synchronization in Java
 
-**Autor:** Eduardo Rico Duarte
+**Author:** Eduardo Rico Duarte
 
-**Curso:** Arquitecturas de Software (ARSW)
+**Course:** Software Architectures (ARSW)
 
-**Institución:** Escuela Colombiana de Ingeniería Julio Garavito
-
----
-
-# Introducción
-
-El presente laboratorio tiene como objetivo analizar y corregir un problema de sincronización en una aplicación concurrente desarrollada en Java. 
-
-A través de este ejercicio se estudian conceptos fundamentales de concurrencia y coordinación de hilos, así como la importancia de los mecanismos de sincronización en aplicaciones concurrentes.
+**Institution:** Escuela Colombiana de Ingeniería Julio Garavito
 
 ---
 
-# Marco Teórico
+# Introduction
 
-La concurrencia permite que múltiples tareas se ejecuten de manera simultánea mediante el uso de hilos (*Threads*). En Java, los hilos comparten memoria y pueden trabajar de forma paralela, lo que mejora el rendimiento de las aplicaciones.
+The purpose of this laboratory is to analyze and correct a synchronization problem in a concurrent Java application.
 
-Cuando varias tareas se ejecutan concurrentemente, es necesario utilizar mecanismos de sincronización para coordinar su ejecución y evitar resultados incorrectos. Una de estas estrategias es la sincronización por barrera, la cual garantiza que un conjunto de hilos alcance un punto determinado antes de que otro proceso pueda continuar.
-
-En este laboratorio se utiliza el método `join()`, que permite al hilo principal esperar la finalización de todos los hilos de trabajo antes de calcular el tiempo promedio de ejecución, asegurando así que los resultados obtenidos sean correctos.
-
+Through this exercise, fundamental concepts of concurrency and thread coordination are studied, as well as the importance of synchronization mechanisms in concurrent applications.
 
 ---
 
-# Desarrollo del Laboratorio
+# Theoretical Framework
 
-## Punto 2. Revisión y ejecución del programa principal
+Concurrency allows multiple tasks to be executed simultaneously through the use of *Threads*. In Java, threads share memory and can work in parallel, improving application performance.
 
-### Objetivo
+When several tasks execute concurrently, synchronization mechanisms are required to coordinate their execution and avoid incorrect results. One such strategy is barrier synchronization, which ensures that a group of threads reaches a specific execution point before another process can continue.
 
-Ejecutar el programa suministrado, observar su comportamiento y analizar si el cálculo del tiempo promedio de ejecución es correcto.
+In this laboratory, the `join()` method is used to make the main thread wait for all worker threads to finish before calculating the average execution time, ensuring that the obtained results are correct.
 
-### Desarrollo
+---
 
-El programa crea 20 hilos (`HiloProc`), cada uno con un tiempo de espera aleatorio. Cada hilo ejecuta una tarea compuesta por 10 iteraciones y registra el tiempo total de ejecución en la variable `resultado`.
+# Laboratory Development
 
-Al ejecutar el programa se obtuvo la siguiente  salida:
+## Point 2. Review and Execution of the Main Program
+
+### Objective
+
+Execute the provided program, observe its behavior, and analyze whether the calculation of the average execution time is correct.
+
+### Development
+
+The program creates 20 threads (`HiloProc`), each with a random waiting time. Each thread executes a task consisting of 10 iterations and records its total execution time in the `resultado` variable.
+
+When the program was executed, the following output was obtained:
 
 ![alt text](Imagenes/EV1.png)
 
@@ -51,31 +50,31 @@ Al ejecutar el programa se obtuvo la siguiente  salida:
 
 ![alt text](Imagenes/Ev2.png)
 
-Se observó que el mensaje del tiempo promedio aparece inmediatamente después de iniciar los hilos, incluso antes de que estos comiencen a completar sus tareas.
+It was observed that the average execution time message appeared immediately after starting the threads, even before they began completing their tasks.
 
-### Análisis
+### Analysis
 
-El resultado obtenido no es correcto. El promedio calculado es igual a cero debido a que el hilo principal realiza el cálculo inmediatamente después de invocar `start()` sobre los hilos.
+The obtained result is incorrect. The calculated average is equal to zero because the main thread performs the calculation immediately after invoking `start()` on the worker threads.
 
-La variable `resultado` de cada hilo se inicializa en cero y solamente es actualizada cuando el método `run()` finaliza. Como el hilo principal no espera la terminación de los hilos, el cálculo del promedio se realiza utilizando valores que aún no han sido actualizados.
+The `resultado` variable of each thread is initialized to zero and is only updated when the `run()` method finishes. Since the main thread does not wait for the worker threads to complete, the average is calculated using values that have not yet been updated.
 
-### Conclusión
+### Conclusion
 
-El programa presenta un problema de sincronización. El cálculo del promedio se ejecuta antes de que los hilos terminen su trabajo, generando un resultado incorrecto.
+The program presents a synchronization problem. The average execution time is calculated before the threads complete their work, producing an incorrect result.
 
 ---
 
-## Punto 3. Aplicación de una estrategia de sincronización por barrera
+## Point 3. Applying a Barrier Synchronization Strategy
 
-### Objetivo
+### Objective
 
-Garantizar que el cálculo del tiempo promedio de ejecución se realice únicamente después de que todos los hilos hayan terminado.
+Ensure that the average execution time is calculated only after all threads have completed their execution.
 
-### Desarrollo
+### Development
 
-Para solucionar el problema se utilizó el método `join()` de Java. Este método permite que el hilo principal espere la terminación de cada uno de los hilos de trabajo antes de continuar con su ejecución.
+To solve the problem, Java's `join()` method was used. This method allows the main thread to wait for each worker thread to finish before continuing its execution.
 
-Se agregó el siguiente bloque de código después de iniciar los hilos:
+The following code block was added after starting the threads:
 
 ```java
 try {
@@ -87,38 +86,38 @@ try {
 }
 ```
 
-Una vez que todos los hilos terminan, el programa calcula el promedio utilizando los tiempos reales registrados por cada hilo.
+Once all threads finish, the program calculates the average using the actual execution times recorded by each thread.
 
-### Explicación de la solución
+### Solution Explanation
 
-El método `join()` bloquea la ejecución del hilo principal hasta que el hilo correspondiente finaliza. Al aplicar `join()` sobre todos los hilos del arreglo, el programa garantiza que el cálculo del promedio no se ejecute hasta que todos hayan completado su tarea.
+The `join()` method blocks the execution of the main thread until the corresponding thread finishes. By applying `join()` to every thread in the array, the program guarantees that the average calculation is not performed until all threads have completed their tasks.
 
-Esta estrategia produce el mismo efecto esperado de una barrera de sincronización para este escenario, ya que obliga al hilo principal a esperar la finalización de todos los participantes antes de continuar.
+This strategy produces the same expected effect as a synchronization barrier in this scenario, since it forces the main thread to wait for all participants to finish before continuing.
 
-### Conclusión
+### Conclusion
 
-La sincronización implementada elimina el problema identificado en el punto anterior y asegura que el promedio sea calculado utilizando información válida y completa.
+The implemented synchronization mechanism eliminates the problem identified in the previous point and ensures that the average is calculated using valid and complete information.
 
 ---
 
-## Punto 4. Verificación del funcionamiento
+## Point 4. Verification of the Solution
 
-### Objetivo
+### Objective
 
-Comprobar que la estrategia de sincronización implementada corrige el comportamiento incorrecto del programa.
+Verify that the implemented synchronization strategy corrects the incorrect behavior of the program.
 
-### Desarrollo
+### Development
 
-Después de aplicar la sincronización mediante `join()`, el programa fue ejecutado nuevamente.
+After applying synchronization through `join()`, the program was executed again.
 
-Durante la ejecución se observó que:
+During execution, the following behavior was observed:
 
-1. Los 20 hilos realizan su trabajo concurrentemente.
-2. El hilo principal permanece bloqueado mientras los hilos se ejecutan.
-3. Todos los hilos completan sus 10 iteraciones.
-4. El mensaje del tiempo promedio aparece únicamente al final de la ejecución.
+1. The 20 threads perform their work concurrently.
+2. The main thread remains blocked while the worker threads execute.
+3. All threads complete their 10 iterations.
+4. The average execution time message appears only at the end of the execution.
 
-La salida ahora presenta el siguiente comportamiento:
+The output now presents the following behavior:
 
 ![alt text](Imagenes/Ev3.png)
 
@@ -126,33 +125,33 @@ La salida ahora presenta el siguiente comportamiento:
 
 ![alt text](Imagenes/ev4.png)
 
-### Análisis
+### Analysis
 
-El cambio confirma que el hilo principal espera correctamente la finalización de todos los hilos antes de continuar.
+The change confirms that the main thread correctly waits for all worker threads to finish before continuing.
 
-Cuando se realiza el cálculo, todas las instancias de `HiloProc` ya han actualizado su variable `resultado`, por lo que el promedio obtenido corresponde al tiempo real de ejecución de los hilos.
+When the calculation is performed, all instances of `HiloProc` have already updated their `resultado` variable, meaning that the calculated average corresponds to the actual execution time of the threads.
 
-### Conclusión
+### Conclusion
 
-La solución implementada funciona correctamente y cumple con el objetivo del laboratorio. El cálculo del promedio se realiza únicamente después de que todos los hilos han terminado, eliminando el problema de sincronización presente en la versión original del programa.
-
----
-
-# Conclusiones Generales
-
-* La concurrencia permite ejecutar múltiples tareas simultáneamente mediante hilos.
-* El uso incorrecto de hilos puede generar problemas de sincronización y resultados inconsistentes.
-* El método `start()` únicamente inicia la ejecución de un hilo, pero no garantiza su finalización.
-* La sincronización es necesaria cuando una operación depende de los resultados producidos por múltiples hilos.
-* El método `join()` permite coordinar la ejecución entre el hilo principal y los hilos trabajadores, garantizando que una tarea continúe únicamente cuando todas las demás han terminado.
-* La solución implementada permitió obtener un tiempo promedio de ejecución válido y consistente.
+The implemented solution works correctly and fulfills the objective of the laboratory. The average execution time is calculated only after all threads have completed their execution, eliminating the synchronization problem present in the original version of the program.
 
 ---
 
-# Bibliografía
+# General Conclusions
+
+* Concurrency allows multiple tasks to be executed simultaneously through threads.
+* Incorrect use of threads can lead to synchronization problems and inconsistent results.
+* The `start()` method only initiates thread execution and does not guarantee its completion.
+* Synchronization is necessary when an operation depends on results produced by multiple threads.
+* The `join()` method allows coordination between the main thread and worker threads, ensuring that a task continues only after all others have finished.
+* The implemented solution made it possible to obtain a valid and consistent average execution time.
+
+---
+
+# References
 
 Benavides Navarro, L. D., & Gualtero Martínez, R. H. (2024). *Concurrency and Threads in Java and Go* [Course slides].
 
 OpenAI. (2026). *ChatGPT (GPT-5.5 version)* [Large Language Model]. https://chatgpt.com/ (Used primarily as a support tool.)
 
-Oracle. (2024). Thread (Java Platform, Standard Edition 24 API Specification). Oracle Corporation. https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/Thread.html
+Oracle. (2024). *Thread (Java Platform, Standard Edition 24 API Specification).* Oracle Corporation. https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/Thread.html
