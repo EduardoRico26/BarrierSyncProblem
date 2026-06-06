@@ -14,13 +14,24 @@ public class Main {
 			hilos[i].start();
 		}
 
-		long tiempoPromedio=0;
-		
-		for (int i=0;i<numHilos;i++){
-			tiempoPromedio+=hilos[i].getResultado();
+		try {
+
+			for (int i = 0; i < numHilos; i++) {
+				hilos[i].join();
+			}
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
-		System.out.println("El tiempo promedio de la ejecución fue de:"+tiempoPromedio/numHilos);
+		long tiempoPromedio = 0;
+
+		for (int i = 0; i < numHilos; i++) {
+			tiempoPromedio += hilos[i].getResultado();
+		}
+
+		System.out.println("El tiempo promedio de la ejecucion fue de: "
+				+ tiempoPromedio / numHilos+ " ms");
 	}
 	
 }
